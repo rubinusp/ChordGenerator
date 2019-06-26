@@ -1,0 +1,11 @@
+from enum import Enum
+
+class ChordID(Enum):
+    MAJOR_SEVENTH = 1
+    MINOR_SEVENTH = 2
+    DOMINANT_SEVENTH = 3
+    DIMINISHED_SEVENTH = 4
+    MAJOR_TRIAD = 5
+    MINOR_TRIAD = 6
+    AUGMENTED_TRIAD = 7
+    DIMINISHED_TRIAD = 8
