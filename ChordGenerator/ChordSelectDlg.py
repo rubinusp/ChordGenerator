@@ -3,6 +3,7 @@ import sys
 
 # 2. Extension Modules
 from PySide2.QtWidgets import *
+from PySide2.QtCore import *
 
 # 3. Local Modules
 from ChordGenerator.ChordDisplayDlg import ChordDisplayDlg
@@ -13,7 +14,6 @@ class ChordSelectDlg(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Select chord")
-        self.resize(200, 600)
 
         # Create radio button widgets
         self.major_seventh = QRadioButton("Major Seventh")
@@ -26,37 +26,60 @@ class ChordSelectDlg(QDialog):
         self.diminished_triad = QRadioButton("Diminished Triad")
 
         # Create Button Group for radio buttons
-        self.chordButtonGroup = QButtonGroup()
-        self.chordButtonGroup.addButton(self.major_seventh, ChordID.MAJOR_SEVENTH)
-        self.chordButtonGroup.addButton(self.minor_seventh, ChordID.MINOR_SEVENTH)
-        self.chordButtonGroup.addButton(self.dominant_seventh, ChordID.DOMINANT_SEVENTH)
-        self.chordButtonGroup.addButton(self.diminished_seventh, ChordID.DIMINISHED_SEVENTH)
-        self.chordButtonGroup.addButton(self.major_triad, ChordID.MAJOR_TRIAD)
-        self.chordButtonGroup.addButton(self.minor_triad, ChordID.MINOR_TRIAD)
-        self.chordButtonGroup.addButton(self.augmented_triad, ChordID.AUGMENTED_TRIAD)
-        self.chordButtonGroup.addButton(self.diminished_triad, ChordID.DIMINISHED_TRIAD)
+        chordLayout = QVBoxLayout()
+        chordLayout.addWidget(self.major_seventh, ChordID.MAJOR_SEVENTH)
+        chordLayout.addWidget(self.minor_seventh, ChordID.MINOR_SEVENTH)
+        chordLayout.addWidget(self.dominant_seventh, ChordID.DOMINANT_SEVENTH)
+        chordLayout.addWidget(self.diminished_seventh, ChordID.DIMINISHED_SEVENTH)
+        chordLayout.addWidget(self.major_triad, ChordID.MAJOR_TRIAD)
+        chordLayout.addWidget(self.minor_triad, ChordID.MINOR_TRIAD)
+        chordLayout.addWidget(self.augmented_triad, ChordID.AUGMENTED_TRIAD)
+        chordLayout.addWidget(self.diminished_triad, ChordID.DIMINISHED_TRIAD)
 
-        # TODO:: create a vertical layout which contain button group added into the main layout
+        # Create group box for chords
+        self.chordBoxGroup = QGroupBox("Chord")
+        self.chordBoxGroup.setLayout(chordLayout)
 
-        # Create standard button widgets
-        self.okayButton = QPushButton("Okay")
-        self.cancelButton = QPushButton("Cancel")
-
-        layout = QHBoxLayout()
-        layout.addWidget(self.okayButton)
-        layout.addWidget(self.cancelButton)
-
-        # Set dialog layout
-        self.setLayout(layout)
+        # Create standard button box
+        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal)
 
         # Add button signal
-        self.okayButton.clicked.connect(self.on_okay_button_clicked)
-        self.cancelButton.clicked.connect(self.reject)
+        self.buttonBox.accepted.connect(self.on_okay_button_clicked)
+        self.buttonBox.rejected.connect(self.reject)
+
+        # configure dialog layout
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(self.chordBoxGroup)
+        mainLayout.addWidget(self.buttonBox)
+
+        # Set dialog layout
+        self.setLayout(mainLayout)
+
+        # TODO: disable okay button if no chord is selected initially
 
     def on_okay_button_clicked(self):
         self.hide()
-        self.chordDisplayDlg = ChordDisplayDlg()
+        clickedChord = self.getClickedChordID()
+        self.chordDisplayDlg = ChordDisplayDlg(clickedChord)
         self.chordDisplayDlg.show()
+
+    def getClickedChordID(self):
+        if self.major_seventh.isChecked():
+            return ChordID.MAJOR_SEVENTH
+        elif self.minor_seventh.isChecked():
+            return ChordID.MINOR_SEVENTH
+        elif self.dominant_seventh.isChecked():
+            return ChordID.DOMINANT_SEVENTH
+        elif self.diminished_seventh.isChecked():
+            return ChordID.DIMINISHED_SEVENTH
+        elif self.major_triad.isChecked():
+            return ChordID.MAJOR_TRIAD
+        elif self.minor_triad.isChecked():
+            return ChordID.MINOR_TRIAD
+        elif self.augmented_triad.isChecked():
+            return ChordID.AUGMENTED_TRIAD
+        else:
+            return ChordID.DIMINISHED_TRIAD
 
 def main():
 

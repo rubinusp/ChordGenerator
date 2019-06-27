@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import IntEnum
 
-class ChordID(Enum):
+class ChordID(IntEnum):
     MAJOR_SEVENTH = 1
     MINOR_SEVENTH = 2
     DOMINANT_SEVENTH = 3
