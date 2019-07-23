@@ -1,5 +1,6 @@
 import sys
 from PySide2.QtWidgets import *
+from ChordUtil import ChordUtil
 
 class ChordDisplayDlg(QDialog):
 
@@ -11,3 +12,5 @@ class ChordDisplayDlg(QDialog):
         self.clickedChord = clickedChord
 
         print(clickedChord)
+        chordUtil = ChordUtil()
+        chordUtil.playChord(clickedChord)
