@@ -9,10 +9,10 @@ from PySide2.QtCore import *
 from ChordGenerator.ChordDisplayDlg import ChordDisplayDlg
 from ChordGenerator.chord_id import ChordID
 
+
 class ChordSelectDlg(QDialog):
 
     def __init__(self, parent=None):
-
         super().__init__(parent)
         self.setWindowTitle("Select chord")
 
@@ -106,12 +106,14 @@ class ChordSelectDlg(QDialog):
         else:
             return ChordID.DIMIN_TRI
 
+
 def main():
 
     app = QApplication(sys.argv)
     dlg = ChordSelectDlg()
     dlg.show()
     app.exec_()
+
 
 if __name__ == "__main__":
     main()

@@ -1,40 +1,22 @@
-from chord_id import ChordID
 import math
 import struct
-import random
 import wave
 
-class ChordUtil:
-    def playChord(self, chord_id):
-        major7th = [0, 4, 7, 11]
-        minor7th = [0, 3, 7, 10]
-        domin7th = [0, 4, 7, 10]
-        dimin7th = [0, 3, 6, 10]
-        majorTri = [0, 4, 7]
-        minorTri = [0, 3, 7]
-        augmeTri = [0, 4, 8]
-        diminTri = [0, 3, 6]
 
-        if chord_id == ChordID.MAJOR_7TH:
-            scale = major7th
-        elif chord_id == ChordID.MINOR_7TH:
-            scale = scale = minor7th
-        elif chord_id == ChordID.DOMIN_7TH:
-            scale = domin7th
-        elif chord_id == ChordID.DIMIN_7TH:
-            scale = dimin7th
-        elif chord_id == ChordID.MAJOR_TRI:
-            scale = majorTri
-        elif chord_id == ChordID.MINOR_TRI:
-            scale = minorTri
-        elif chord_id == ChordID.AUGME_TRI:
-            scale = augmeTri
-        else:
-            scale = diminTri
+class ChordUtil:
+
+    """ This class provides utility functions to read, write, and play chords.
+
+    All utility functions should be static methods. """
+
+    @staticmethod
+    def playChord(chord_id):
+        scale = chord_id.getScale()
 
         # pow(2, 5/12) = obtain the equal ratio factor (i.e. 1.059246...) and then rise to 5 half steps above
         start_note = 220 * (pow(2, 5/12))
 
+        # obtain the list of the actual frequencies
         temp = []
         for note in scale:
             note = start_note * (pow(2, note/12))
@@ -42,31 +24,33 @@ class ChordUtil:
 
         scale = temp
 
-        self.writeChord(scale)
+        ChordUtil.__writeChord(scale)
 
-    def writeChord(self, scale):
+    @staticmethod
+    def __writeChord(scale):
         duration = 3
-        volume = 300
+        amplitude = 300
 
         sampwidth = 4 # bytes
         framerate = 44100
         nframes = sampwidth * framerate
 
         writer = wave.open("chord.wav", "wb")
-        params = (1, sampwidth, framerate, nframes, "NONE", "NONE")
-            # nchannels, sampwidth, framerate, nframes, comptype, compname
+        params = (1, sampwidth, framerate, nframes, "NONE", "NONE") # nchannels, sampwidth, framerate, nframes,
+                                                                    # comptype, compname
         writer.setparams(params)
 
         for i in range(nframes):
-            value = self.synChord(scale, i / framerate, volume)
+            value = ChordUtil.__synChord(scale, i / framerate, amplitude)
             print(value)
             data = struct.pack("<h", int(value))
             writer.writeframesraw(data)
 
         writer.close()
 
-    def synChord(self, scale, t, v):
+    @staticmethod
+    def __synChord(scale, t, A):
         value = 0
         for i in range(len(scale)):
-            value += v * math.sin(2 * math.pi * scale[i] * t)
+            value += A * math.sin(2 * math.pi * scale[i] * t)
         return value
