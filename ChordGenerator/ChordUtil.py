@@ -42,7 +42,6 @@ class ChordUtil:
 
         for i in range(nframes):
             value = ChordUtil.__synChord(scale, i / framerate, amplitude)
-            print(value)
             data = struct.pack("<h", int(value))
             writer.writeframesraw(data)
 

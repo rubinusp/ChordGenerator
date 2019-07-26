@@ -13,6 +13,7 @@ from ChordGenerator.chord_id import ChordID
 class ChordSelectDlg(QDialog):
 
     def __init__(self, parent=None):
+
         super().__init__(parent)
         self.setWindowTitle("Select chord")
 
