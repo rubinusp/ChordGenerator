@@ -5,14 +5,31 @@ from PySide2.QtWidgets import *
 from PySide2.QtCharts import *
 
 # 3. Local Modules
+from ChordUtil import ChordUtil
 
 
-class FreqSpectrum:
+class FreqSpectrum(QtCharts.QChart):
 
-    def __init__(self):
+    def __init__(self, parent = None):
 
-        self.chart = QtCharts.QChart()
-        self.chart.setAnimationOptions(QtCharts.QChart.AllAnimations)
+        super().__init__(parent)
 
-        series = QtCharts.QSplineSeries()
+        self.setAnimationOptions(QtCharts.QChart.AllAnimations)
+        self.legend().hide()
+
+        series = QtCharts.QLineSeries()
+        self.feedDataToSeries(series)
+
+        self.addSeries(series)
+        self.createDefaultAxes()
+
+    def feedDataToSeries(self, series):
+        data = ChordUtil.readWav()
+
+        x = 0
+        for value in data:
+            series.append(x, value)
+            x += 1
+
+
 

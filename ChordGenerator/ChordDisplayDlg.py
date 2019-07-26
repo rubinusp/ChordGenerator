@@ -3,9 +3,11 @@
 # 2. Extension Modules
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
+from PySide2.QtCharts import *
 
 # 3. Local Modules
 from ChordUtil import ChordUtil
+from FreqSpectrum import FreqSpectrum
 
 
 class ChordDisplayDlg(QDialog):
@@ -13,7 +15,7 @@ class ChordDisplayDlg(QDialog):
     def __init__(self, chord_id, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Chord displayer")
-        self.resize(500, 500)
+        self.resize(1000, 500)
 
         self.clickedChord = chord_id
         ChordUtil.playChord(self.clickedChord)
@@ -91,6 +93,11 @@ class ChordDisplayDlg(QDialog):
         self.propBox = QGroupBox("Property")
         self.propBox.setLayout(prop_layout)
 
+        # Setup frequency spectrum
+        self.spectrum = FreqSpectrum()
+
+        spectrum_view = QtCharts.QChartView(self.spectrum)
+
         # Setup standard dialog buttons
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal)
 
@@ -101,7 +108,8 @@ class ChordDisplayDlg(QDialog):
         main_layout = QGridLayout()
         main_layout.addWidget(self.chordBox, 0, 0)
         main_layout.addWidget(self.propBox, 0, 1)
-        main_layout.addWidget(self.buttonBox, 1, 0, 1, 2)
+        main_layout.addWidget(spectrum_view, 1, 0, 1, 2)
+        main_layout.addWidget(self.buttonBox, 2, 0, 1, 2)
 
         # Set dialog layout
         self.setLayout(main_layout)

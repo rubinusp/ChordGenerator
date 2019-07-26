@@ -53,3 +53,18 @@ class ChordUtil:
         for i in range(len(scale)):
             value += A * math.sin(2 * math.pi * scale[i] * t)
         return value
+
+    @staticmethod
+    def readWav():
+        reader = wave.open("chord.wav", "rb")
+
+        nframes = reader.getnframes()
+        list = []
+        for i in range(2000):
+            value = reader.readframes(1)
+            data = struct.unpack("<i", value)[0]
+            list.append(data)
+
+        reader.close()
+        print(list)
+        return list
