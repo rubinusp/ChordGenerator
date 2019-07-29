@@ -33,11 +33,13 @@ class ChordUtil:
         writer.close()
 
     @staticmethod
-    def genFreqList(rootNote, chord_id, amplitude, duration, framerate):
-        """ generates the list of frequencies representing the sound of the chord """
+    def genFreqList(rootFreq, chord_id, amplitude, duration, framerate):
+
+        """ generates the list of frequencies representing the sound of the chord
+        """
 
         # obtain the scale given the root note and the type of chord
-        scale = ChordUtil.__genScale(rootNote, chord_id)
+        scale = ChordUtil.__genScale(rootFreq, chord_id)
 
         list = []
         for i in range(duration * framerate):
@@ -46,14 +48,16 @@ class ChordUtil:
         return list
 
     @staticmethod
-    def __genScale(rootNote, chord_id):
-        """ generates the list of frequencies of each pitch in the given chord type """
+    def __genScale(rootFreq, chord_id):
+
+        """ generates the list of frequencies of each pitch in the given chord type
+        """
 
         scale = chord_id.getScale()
 
         temp = []
         for note in scale:
-            note = rootNote * (pow(2, note / 12))
+            note = rootFreq * (pow(2, note / 12))
             temp.append(note)
 
         return temp
@@ -140,4 +144,66 @@ class ChordUtil:
             49: "A7",
             50: "B7",
             51: "C8",
+        }[i]
+
+    @staticmethod
+    def fromIntToFreq(i):
+
+        """ returns the corresponding frequency given the pitch index
+        """
+
+        # TODO: throws exception if i is out of range
+        return {
+            0: 28,
+            1: 31,
+            2: 33,
+            3: 37,
+            4: 41,
+            5: 44,
+            6: 49,
+            7: 55,
+            8: 62,
+            9: 65,
+            10: 73,
+            11: 82,
+            12: 87,
+            13: 98,
+            14: 110,
+            15: 124,
+            16: 131,
+            17: 147,
+            18: 165,
+            19: 175,
+            20: 196,
+            21: 220,
+            22: 247,
+            23: 262,
+            24: 294,
+            25: 330,
+            26: 349,
+            27: 392,
+            28: 440,
+            29: 494,
+            30: 523,
+            31: 587,
+            32: 659,
+            33: 699,
+            34: 784,
+            35: 880,
+            36: 988,
+            37: 1047,
+            38: 1175,
+            39: 1319,
+            40: 1397,
+            41: 1568,
+            42: 1760,
+            43: 1976,
+            44: 2093,
+            45: 2349,
+            46: 2637,
+            47: 2794,
+            48: 3136,
+            49: 3520,
+            50: 3951,
+            51: 4186,
         }[i]

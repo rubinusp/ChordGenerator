@@ -17,12 +17,6 @@ class FreqSpectrum(QtCharts.QChart):
         self.setAnimationOptions(QtCharts.QChart.AllAnimations)
         self.legend().hide()
 
-        series = QtCharts.QLineSeries()
-        #self.feedWavToSeries(series)
-
-        self.addSeries(series)
-        self.createDefaultAxes()
-
     def feedWavToSeries(self, series):
         data = ChordUtil.readWav()
 
@@ -34,12 +28,13 @@ class FreqSpectrum(QtCharts.QChart):
     def genSeriesByProperties(self, rootNote, chord_id, volume, duration):
         framerate = 44100
 
-        freqs = ChordUtil.genFreqList(rootNote, chord_id, volume, duration, framerate)
+        rootFreq = ChordUtil.fromIntToFreq(rootNote)
+        freqs = ChordUtil.genFreqList(rootFreq, chord_id, volume, duration, framerate)
 
         series = QtCharts.QLineSeries()
         t = 0
         for freq in freqs:
-            series.append(t, freq)
+            series.append(t / framerate, freq)
             t += 1
 
         self.addSeries(series)
