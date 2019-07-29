@@ -17,12 +17,13 @@ class ChordDisplayDlg(QDialog):
         self.setWindowTitle("Chord displayer")
         self.resize(1000, 500)
 
-        self.clickedChord = chord_id
-        ChordUtil.playChord(self.clickedChord)
+        # Data Members
+        self.rootNote = 23
+        self.volume = 50
+        self.duration = 3
+        self.chord_id = chord_id
 
-        # Property
-        self.rootNote = None
-        self.volume = None
+        ChordUtil.exportChord(self.chord_id)
 
         # List Items For Scale
         self.major7th = None
@@ -38,6 +39,12 @@ class ChordDisplayDlg(QDialog):
         # Property Slider
         self.rootNoteSl = None
         self.volumeSl = None
+        self.durationSl = None
+
+        # Property Value Display
+        self.rootNoteVal = None
+        self.volumeVal = None
+        self.durationVal = None
 
         # Frequency Spectrum Graph
         self.spectrum = None
@@ -73,9 +80,10 @@ class ChordDisplayDlg(QDialog):
         rootNoteLabel = QLabel("Root note:")
         self.rootNoteSl = QSlider(Qt.Horizontal)
         self.rootNoteSl.setMinimum(0)   # A0 frequency
-        self.rootNoteSl.setMaximum(88)  # C8 frequency
-        self.rootNoteSl.setValue(38)    # C4 frequency
+        self.rootNoteSl.setMaximum(51)  # C8 frequency
+        self.rootNoteSl.setValue(23)    # C4 frequency
         self.rootNoteSl.valueChanged.connect(self.on_root_note_value_changed)
+        self.rootNoteVal = QLabel("C4")
 
         volumeLabel = QLabel("Volume:")
         self.volumeSl = QSlider(Qt.Horizontal)
@@ -83,18 +91,33 @@ class ChordDisplayDlg(QDialog):
         self.volumeSl.setMaximum(100)
         self.volumeSl.setValue(50)
         self.volumeSl.valueChanged.connect(self.on_volume_value_changed)
+        self.volumeVal = QLabel("50")
+
+        durationLabel = QLabel("Duration:")
+        self.durationSl = QSlider(Qt.Horizontal)
+        self.durationSl.setMinimum(0)
+        self.durationSl.setMaximum(10)
+        self.durationSl.setValue(3)
+        self.durationSl.valueChanged.connect(self.on_duration_value_changed)
+        self.durationVal = QLabel("3")
 
         prop_layout = QGridLayout()
         prop_layout.addWidget(rootNoteLabel, 0, 0)
         prop_layout.addWidget(self.rootNoteSl, 0, 1)
+        prop_layout.addWidget(self.rootNoteVal, 0, 2)
         prop_layout.addWidget(volumeLabel, 1, 0)
         prop_layout.addWidget(self.volumeSl, 1, 1)
+        prop_layout.addWidget(self.volumeVal, 1, 2)
+        prop_layout.addWidget(durationLabel, 2, 0)
+        prop_layout.addWidget(self.durationSl, 2, 1)
+        prop_layout.addWidget(self.durationVal, 2, 2)
 
         self.propBox = QGroupBox("Property")
         self.propBox.setLayout(prop_layout)
 
         # Setup frequency spectrum
         self.spectrum = FreqSpectrum()
+        self.spectrum.genSeriesByProperties(self.rootNote, self.chord_id, self.volume, self.duration)
 
         spectrum_view = QtCharts.QChartView(self.spectrum)
 
@@ -115,9 +138,19 @@ class ChordDisplayDlg(QDialog):
         self.setLayout(main_layout)
 
     def on_root_note_value_changed(self):
+        val = ChordUtil.fromIntToSPN(self.rootNoteSl.value())
+        self.rootNoteVal.setText(val)
+
         return
 
     def on_volume_value_changed(self):
+        val = str(self.volumeSl.value())
+        self.volumeVal.setText(val)
+        return
+
+    def on_duration_value_changed(self):
+        val = str(self.durationSl.value())
+        self.durationVal.setText(val)
         return
 
     def on_okay_clicked(self):
