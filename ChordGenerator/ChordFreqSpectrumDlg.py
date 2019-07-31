@@ -35,11 +35,12 @@ class ChordFreqSpectrumDlg(QDialog):
 
         self.spectrum = FreqSpectrum()
         self.spectrum.addSeriesByPoints(points)
-        self.spectrum.setup_chart(10, 9)
+        self.spectrum.setup_chart(10, 9, True)
 
     def setup_ui(self):
 
         spectrum_view = QtCharts.QChartView(self.spectrum)
+        spectrum_view.setRubberBand(QtCharts.QChartView.HorizontalRubberBand)
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(spectrum_view)

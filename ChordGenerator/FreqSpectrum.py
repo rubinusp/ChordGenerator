@@ -20,17 +20,23 @@ class FreqSpectrum(QtCharts.QChart):
         # Components
         self.series = None
 
-    def setup_chart(self, count_x, count_y):
+    def setup_chart(self, count_x, count_y, show_axis_titles):
 
         # Setting X-axis
         axis_x = QtCharts.QValueAxis()
         axis_x.setTickCount(count_x)
+        if show_axis_titles:
+            axis_x.setTitleText("Time")
+
         self.addAxis(axis_x, Qt.AlignBottom)
         self.series.attachAxis(axis_x)
 
         # Setting Y-axis
         axis_y = QtCharts.QValueAxis()
         axis_y.setTickCount(count_y)
+        if show_axis_titles:
+            axis_y.setTitleText("Amplitude")
+
         self.addAxis(axis_y, Qt.AlignLeft)
         self.series.attachAxis(axis_y)
 
@@ -47,12 +53,11 @@ class FreqSpectrum(QtCharts.QChart):
         freqs = ChordUtil.genFreqList(rootFreq, chord_id, volume, duration, framerate)
 
         self.series = QtCharts.QLineSeries()
-        t = 0
+        i = 0
         for freq in freqs:
-            self.series.append(t / framerate, freq)
-            t += 1
-            if t == 1000:
-                break
+            t = i / framerate
+            self.series.append(t, freq)
+            i += 1
 
         self.addSeries(self.series)
 

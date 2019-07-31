@@ -129,7 +129,7 @@ class ChordDisplayDlg(QDialog):
         # Setup frequency spectrum
         self.spectrum = FreqSpectrum()
         self.spectrum.addSeriesByProperties(self.rootNote, self.chord_id, self.volume, self.duration)
-        self.spectrum.setup_chart(10, 5)
+        self.spectrum.setup_chart(10, 5, False)
 
         spectrum_view = QtCharts.QChartView(self.spectrum)
 
