@@ -1,4 +1,5 @@
 # 1.Standard Modules
+import copy
 
 # 2. Extension Modules
 from PySide2.QtWidgets import *
@@ -8,6 +9,7 @@ from PySide2.QtCharts import *
 # 3. Local Modules
 from ChordUtil import ChordUtil
 from FreqSpectrum import FreqSpectrum
+from ChordFreqSpectrumDlg import ChordFreqSpectrumDlg
 
 
 class ChordDisplayDlg(QDialog):
@@ -49,10 +51,19 @@ class ChordDisplayDlg(QDialog):
         # Frequency Spectrum Graph
         self.spectrum = None
 
+        # Option Buttons
+        self.viewBtn = None
+        self.exportBtn = None
+        self.resetBtn = None
+
         # Boxes
         self.propBox = None
         self.chordBox = None
-        self.buttonBox = None
+        self.optButtonBox = None
+        self.dlgButtonBox = None
+
+        # Dialog
+        self.chordFreqSpectrumDlg = None
 
         self.setup_ui()
 
@@ -117,22 +128,39 @@ class ChordDisplayDlg(QDialog):
 
         # Setup frequency spectrum
         self.spectrum = FreqSpectrum()
-        self.spectrum.genSeriesByProperties(self.rootNote, self.chord_id, self.volume, self.duration)
+        self.spectrum.addSeriesByProperties(self.rootNote, self.chord_id, self.volume, self.duration)
+        self.spectrum.setup_chart(10, 5)
 
         spectrum_view = QtCharts.QChartView(self.spectrum)
 
-        # Setup standard dialog buttons
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal)
+        # Setup option buttons
+        self.viewBtn = QPushButton("View")
+        self.viewBtn.clicked.connect(self.on_view_click)
+        self.exportBtn = QPushButton("Export")
+        self.exportBtn.clicked.connect(self.on_export_click)
+        self.resetBtn = QPushButton("Reset")
 
-        self.buttonBox.accepted.connect(self.on_okay_clicked)
-        self.buttonBox.rejected.connect(self.reject)
+        opt_button_layout = QHBoxLayout()
+        opt_button_layout.addWidget(self.viewBtn)
+        opt_button_layout.addWidget(self.exportBtn)
+        opt_button_layout.addWidget(self.resetBtn)
+
+        self.optButtonBox = QWidget()
+        self.optButtonBox.setLayout(opt_button_layout)
+
+        # Setup standard dialog buttons
+        self.dlgButtonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal)
+
+        self.dlgButtonBox.accepted.connect(self.on_okay_clicked)
+        self.dlgButtonBox.rejected.connect(self.reject)
 
         # configure dialog layout
         main_layout = QGridLayout()
         main_layout.addWidget(self.chordBox, 0, 0)
         main_layout.addWidget(self.propBox, 0, 1)
         main_layout.addWidget(spectrum_view, 1, 0, 1, 2)
-        main_layout.addWidget(self.buttonBox, 2, 0, 1, 2)
+        main_layout.addWidget(self.optButtonBox, 2, 0)
+        main_layout.addWidget(self.dlgButtonBox, 2, 1)
 
         # Set dialog layout
         self.setLayout(main_layout)
@@ -151,6 +179,19 @@ class ChordDisplayDlg(QDialog):
     def on_duration_value_changed(self):
         val = str(self.durationSl.value())
         self.durationVal.setText(val)
+        return
+
+    def on_view_click(self):
+
+        self.chordFreqSpectrumDlg = ChordFreqSpectrumDlg(copy.deepcopy(self.spectrum.series.points()), self)
+        self.chordFreqSpectrumDlg.show()
+
+    def on_export_click(self):
+        ChordUtil.exportChord(self.chord_id)
+
+        msg = QMessageBox()
+        msg.setText("The chord has been exported successfully.")
+        msg.exec()
         return
 
     def on_okay_clicked(self):

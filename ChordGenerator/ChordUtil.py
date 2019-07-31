@@ -20,14 +20,14 @@ class ChordUtil:
         framerate = 44100
         nframes = duration * framerate
 
-        list = ChordUtil.genFreqList(rootNote, chord_id, amplitude, duration, framerate)
+        freqs = ChordUtil.genFreqList(rootNote, chord_id, amplitude, duration, framerate)
 
         writer = wave.open("chord.wav", "wb")
         params = (1, sampwidth, framerate, nframes, "NONE", "NONE")  # nchannels, sampwidth, framerate, nframes,
         # comptype, compname
         writer.setparams(params)
-        for i in list:
-            data = struct.pack("<h", int(i))
+        for freq in freqs:
+            data = struct.pack("<h", freq)
             writer.writeframesraw(data)
 
         writer.close()
@@ -36,14 +36,15 @@ class ChordUtil:
     def genFreqList(rootFreq, chord_id, amplitude, duration, framerate):
 
         """ generates the list of frequencies representing the sound of the chord
-        """
+
+        frequencies are rounded to the nearest integer """
 
         # obtain the scale given the root note and the type of chord
         scale = ChordUtil.__genScale(rootFreq, chord_id)
 
         list = []
         for i in range(duration * framerate):
-            value = ChordUtil.__synChord(scale, i / framerate, amplitude)
+            value = int(ChordUtil.__synChord(scale, i / framerate, amplitude))
             list.append(value)
         return list
 
@@ -75,7 +76,7 @@ class ChordUtil:
 
         nframes = reader.getnframes()
         list = []
-        for i in range(2000):
+        for i in range(nframes):
             value = reader.readframes(1)
             data = struct.unpack("<i", value)[0]
             list.append(data)
