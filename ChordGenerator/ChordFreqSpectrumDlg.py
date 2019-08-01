@@ -43,13 +43,13 @@ class ChordFreqSpectrumDlg(QDialog):
         self.spectrum = FreqSpectrum()
         self.spectrum.addChordSeriesByPoints(points)
 
-        freqsList = ChordUtil.genSingleNoteFreq(ChordUtil.fromIntToFreq(self.rootNote), self.chord_id, self.duration,
-                                                self.framerate, self.volume)
+        # freqsList = ChordUtil.genSingleNoteFreq(ChordUtil.fromIntToFreq(self.rootNote), self.chord_id, self.duration,
+        #                                         self.framerate, self.volume)
+        #
+        # for name, freqs in zip(freqsList[0::2], freqsList[1::2]):
+        #     self.spectrum.addNoteSeriesByProperties(name, freqs, self.framerate)
 
-        for name, freqs in zip(freqsList[0::2], freqsList[1::2]):
-            self.spectrum.addNoteSeriesByProperties(name, freqs, self.framerate)
-
-        self.spectrum.setup_chart(10, 9, True)
+        self.spectrum.setup_axis(10, 9, True)
         self.spectrum.legend().show()
 
     def setup_ui(self):

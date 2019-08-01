@@ -94,6 +94,7 @@ class ChordDisplayDlg(QDialog):
         self.rootNoteSl.setMinimum(0)   # A0 frequency
         self.rootNoteSl.setMaximum(51)  # C8 frequency
         self.rootNoteSl.setValue(23)    # C4 frequency
+        self.rootNoteSl.setTracking(False)
         self.rootNoteSl.valueChanged.connect(self.on_root_note_value_changed)
         self.rootNoteVal = QLabel("C4")
 
@@ -102,6 +103,7 @@ class ChordDisplayDlg(QDialog):
         self.volumeSl.setMinimum(0)
         self.volumeSl.setMaximum(100)
         self.volumeSl.setValue(50)
+        self.volumeSl.setTracking(False)
         self.volumeSl.valueChanged.connect(self.on_volume_value_changed)
         self.volumeVal = QLabel("50")
 
@@ -110,6 +112,7 @@ class ChordDisplayDlg(QDialog):
         self.durationSl.setMinimum(0)
         self.durationSl.setMaximum(10)
         self.durationSl.setValue(3)
+        self.durationSl.setTracking(False)
         self.durationSl.valueChanged.connect(self.on_duration_value_changed)
         self.durationVal = QLabel("3")
 
@@ -132,7 +135,7 @@ class ChordDisplayDlg(QDialog):
         freqs = ChordUtil.genSynthesizedChordFreqs(ChordUtil.fromIntToFreq(self.rootNote), self.chord_id, self.volume,
                                                    self.duration, self.framerate)
         self.spectrum.addChordSeriesByProperties(freqs, self.framerate)
-        self.spectrum.setup_chart(10, 5, False)
+        self.spectrum.setup_axis(10, 5, False)
 
         spectrum_view = QtCharts.QChartView(self.spectrum)
 
@@ -142,6 +145,7 @@ class ChordDisplayDlg(QDialog):
         self.exportBtn = QPushButton("Export")
         self.exportBtn.clicked.connect(self.on_export_click)
         self.resetBtn = QPushButton("Reset")
+        self.resetBtn.clicked.connect(self.on_reset_click)
 
         opt_button_layout = QHBoxLayout()
         opt_button_layout.addWidget(self.viewBtn)
@@ -169,19 +173,29 @@ class ChordDisplayDlg(QDialog):
         self.setLayout(main_layout)
 
     def on_root_note_value_changed(self):
-        val = ChordUtil.fromIntToSPN(self.rootNoteSl.value())
-        self.rootNoteVal.setText(val)
 
+        val = self.rootNoteSl.value()
+        self.rootNoteVal.setText(ChordUtil.fromIntToSPN(val))
+        self.rootNote = val
+
+        self.__redrawSeries()
         return
 
     def on_volume_value_changed(self):
-        val = str(self.volumeSl.value())
-        self.volumeVal.setText(val)
+
+        val = self.volumeSl.value()
+        self.volumeVal.setText(str(val))
+        self.volume = val
+
+        self.__redrawSeries()
         return
 
     def on_duration_value_changed(self):
-        val = str(self.durationSl.value())
-        self.durationVal.setText(val)
+        val = self.durationSl.value()
+        self.durationVal.setText(str(val))
+        self.duration = val
+
+        self.__redrawSeries()
         return
 
     def on_view_click(self):
@@ -193,6 +207,7 @@ class ChordDisplayDlg(QDialog):
         self.chordFreqSpectrumDlg.show()
 
     def on_export_click(self):
+
         ChordUtil.exportChord(self.chord_id)
 
         msg = QMessageBox()
@@ -200,5 +215,19 @@ class ChordDisplayDlg(QDialog):
         msg.exec()
         return
 
+    def on_reset_click(self):
+
+        self.rootNoteSl.setValue(23)    # C4 frequency
+        self.volumeSl.setValue(50)
+        self.durationSl.setValue(3)
+        return
+
     def on_okay_clicked(self):
+        return
+
+    def __redrawSeries(self):
+
+        freqs = ChordUtil.genSynthesizedChordFreqs(ChordUtil.fromIntToFreq(self.rootNote), self.chord_id, self.volume,
+                                                   self.duration, self.framerate)
+        self.spectrum.addChordSeriesByProperties(freqs, self.framerate)
         return

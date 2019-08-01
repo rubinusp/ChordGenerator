@@ -19,44 +19,59 @@ class FreqSpectrum(QtCharts.QChart):
 
         # Components
         self.chordSeries = None
+        self.axis_x = None
+        self.axis_y = None
 
-    def setup_chart(self, count_x, count_y, show_axis_titles):
+    def setup_axis(self, count_x, count_y, show_axis_titles):
 
         # Setting X-axis
-        axis_x = QtCharts.QValueAxis()
-        axis_x.setTickCount(count_x)
+        self.axis_x = QtCharts.QValueAxis()
+        self.axis_x.setTickCount(count_x)
         if show_axis_titles:
-            axis_x.setTitleText("Time")
+            self.axis_x.setTitleText("Time")
 
-        self.addAxis(axis_x, Qt.AlignBottom)
-        self.chordSeries.attachAxis(axis_x)
+        self.addAxis(self.axis_x, Qt.AlignBottom)
+        self.chordSeries.attachAxis(self.axis_x)
 
         # Setting Y-axis
-        axis_y = QtCharts.QValueAxis()
-        axis_y.setTickCount(count_y)
+        self.axis_y = QtCharts.QValueAxis()
+        self.axis_y.setTickCount(count_y)
         if show_axis_titles:
-            axis_y.setTitleText("Amplitude")
+            self.axis_y.setTitleText("Amplitude")
 
-        self.addAxis(axis_y, Qt.AlignLeft)
-        self.chordSeries.attachAxis(axis_y)
+        self.addAxis(self.axis_y, Qt.AlignLeft)
+        self.chordSeries.attachAxis(self.axis_y)
 
-        if abs(axis_y.min()) > abs(axis_y.max()):
-            axis_y.setMax(-axis_y.min())
-        elif abs(axis_y.max()) > abs(axis_y.min()):
-            axis_y.setMin(-axis_y.max())
+        if abs(self.axis_y.min()) > abs(self.axis_y.max()):
+            self.axis_y.setMax(-self.axis_y.min())
+        elif abs(self.axis_y.max()) > abs(self.axis_y.min()):
+            self.axis_y.setMin(-self.axis_y.max())
 
     def addChordSeriesByProperties(self, freqs, framerate):
 
-        self.chordSeries = QtCharts.QLineSeries()
-        self.chordSeries.setName("Chord")
+        if self.chordSeries is None:
+            # instantiate the chord series if it is the first time
+            self.chordSeries = QtCharts.QLineSeries()
+            self.chordSeries.setName("Chord")
 
-        i = 0
-        for freq in freqs:
-            t = i / framerate
-            self.chordSeries.append(t, freq)
-            i += 1
+            i = 0
+            for freq in freqs:
+                t = i / framerate
+                self.chordSeries.append(t, freq)
+                i += 1
 
-        self.addSeries(self.chordSeries)
+            self.addSeries(self.chordSeries)
+        else:
+            # create QList for the points
+            list = []
+            i = 0
+            for freq in freqs:
+                t = i / framerate
+                qPoint = QPointF(t, freq)
+                list.append(qPoint)
+                i += 1
+
+            self.chordSeries.replace(list)
 
     def addChordSeriesByPoints(self, points):
 

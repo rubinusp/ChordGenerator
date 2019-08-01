@@ -72,7 +72,6 @@ class ChordUtil:
             for j in range(duration * framerate):
                 value = int(ChordUtil.__computeNoteFreq(freq, j / framerate, amplitude))
                 temp.append(value)
-                print(value)
             list.append(temp)
 
         return list
@@ -116,7 +115,6 @@ class ChordUtil:
             list.append(data)
 
         reader.close()
-        print(list)
         return list
 
     @staticmethod
