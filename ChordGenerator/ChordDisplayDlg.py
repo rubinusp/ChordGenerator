@@ -20,10 +20,11 @@ class ChordDisplayDlg(QDialog):
         self.resize(1000, 500)
 
         # Data Members
+        self.chord_id = chord_id
+        self.duration = 3
+        self.framerate = 44100
         self.rootNote = 23
         self.volume = 50
-        self.duration = 3
-        self.chord_id = chord_id
 
         ChordUtil.exportChord(self.chord_id)
 
@@ -128,7 +129,9 @@ class ChordDisplayDlg(QDialog):
 
         # Setup frequency spectrum
         self.spectrum = FreqSpectrum()
-        self.spectrum.addSeriesByProperties(self.rootNote, self.chord_id, self.volume, self.duration)
+        freqs = ChordUtil.genSynthesizedChordFreqs(ChordUtil.fromIntToFreq(self.rootNote), self.chord_id, self.volume,
+                                                   self.duration, self.framerate)
+        self.spectrum.addChordSeriesByProperties(freqs, self.framerate)
         self.spectrum.setup_chart(10, 5, False)
 
         spectrum_view = QtCharts.QChartView(self.spectrum)
@@ -183,7 +186,10 @@ class ChordDisplayDlg(QDialog):
 
     def on_view_click(self):
 
-        self.chordFreqSpectrumDlg = ChordFreqSpectrumDlg(copy.deepcopy(self.spectrum.series.points()), self)
+        points = self.spectrum.chordSeries.points()
+        self.chordFreqSpectrumDlg = ChordFreqSpectrumDlg(copy.deepcopy(points), self.chord_id,
+                                                         self.duration, self.framerate, self.rootNote, self.volume,
+                                                         self)
         self.chordFreqSpectrumDlg.show()
 
     def on_export_click(self):

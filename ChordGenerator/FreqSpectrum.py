@@ -18,7 +18,7 @@ class FreqSpectrum(QtCharts.QChart):
         self.legend().hide()
 
         # Components
-        self.series = None
+        self.chordSeries = None
 
     def setup_chart(self, count_x, count_y, show_axis_titles):
 
@@ -29,7 +29,7 @@ class FreqSpectrum(QtCharts.QChart):
             axis_x.setTitleText("Time")
 
         self.addAxis(axis_x, Qt.AlignBottom)
-        self.series.attachAxis(axis_x)
+        self.chordSeries.attachAxis(axis_x)
 
         # Setting Y-axis
         axis_y = QtCharts.QValueAxis()
@@ -38,32 +38,43 @@ class FreqSpectrum(QtCharts.QChart):
             axis_y.setTitleText("Amplitude")
 
         self.addAxis(axis_y, Qt.AlignLeft)
-        self.series.attachAxis(axis_y)
+        self.chordSeries.attachAxis(axis_y)
 
         if abs(axis_y.min()) > abs(axis_y.max()):
             axis_y.setMax(-axis_y.min())
         elif abs(axis_y.max()) > abs(axis_y.min()):
             axis_y.setMin(-axis_y.max())
 
-    def addSeriesByProperties(self, rootNote, chord_id, volume, duration):
+    def addChordSeriesByProperties(self, freqs, framerate):
 
-        framerate = 44100
+        self.chordSeries = QtCharts.QLineSeries()
+        self.chordSeries.setName("Chord")
 
-        rootFreq = ChordUtil.fromIntToFreq(rootNote)
-        freqs = ChordUtil.genFreqList(rootFreq, chord_id, volume, duration, framerate)
-
-        self.series = QtCharts.QLineSeries()
         i = 0
         for freq in freqs:
             t = i / framerate
-            self.series.append(t, freq)
+            self.chordSeries.append(t, freq)
             i += 1
 
-        self.addSeries(self.series)
+        self.addSeries(self.chordSeries)
 
-    def addSeriesByPoints(self, points):
+    def addChordSeriesByPoints(self, points):
 
-        self.series = QtCharts.QLineSeries()
-        self.series.append(points)
+        self.chordSeries = QtCharts.QLineSeries()
+        self.chordSeries.setName("Chord")
+        self.chordSeries.append(points)
 
-        self.addSeries(self.series)
+        self.addSeries(self.chordSeries)
+
+    def addNoteSeriesByProperties(self, name, freqs, framerate):
+
+        noteSeries = QtCharts.QLineSeries()
+        noteSeries.setName(name)
+
+        i = 0
+        for freq in freqs:
+            t = i / framerate
+            noteSeries.append(t, freq)
+            i += 1
+
+        self.addSeries(noteSeries)

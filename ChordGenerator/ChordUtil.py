@@ -20,7 +20,7 @@ class ChordUtil:
         framerate = 44100
         nframes = duration * framerate
 
-        freqs = ChordUtil.genFreqList(rootNote, chord_id, amplitude, duration, framerate)
+        freqs = ChordUtil.genSynthesizedChordFreqs(rootNote, chord_id, amplitude, duration, framerate)
 
         writer = wave.open("chord.wav", "wb")
         params = (1, sampwidth, framerate, nframes, "NONE", "NONE")  # nchannels, sampwidth, framerate, nframes,
@@ -33,42 +33,76 @@ class ChordUtil:
         writer.close()
 
     @staticmethod
-    def genFreqList(rootFreq, chord_id, amplitude, duration, framerate):
+    def genSynthesizedChordFreqs(rootFreq, chord_id, amplitude, duration, framerate):
 
-        """ generates the list of frequencies representing the sound of the chord
+        """ generates the list of synthesized frequencies corresponding to the chord.
 
-        frequencies are rounded to the nearest integer """
+        Frequencies are rounded to the nearest integer. Any root note should be converted to root frequency by
+        fromIntToFreq(i) before being passed as argument. """
 
         # obtain the scale given the root note and the type of chord
-        scale = ChordUtil.__genScale(rootFreq, chord_id)
+        scaleFreqs = ChordUtil.__genScaleFreqs(rootFreq, chord_id)
 
         list = []
         for i in range(duration * framerate):
-            value = int(ChordUtil.__synChord(scale, i / framerate, amplitude))
+            value = int(ChordUtil.__synScaleFreqs(scaleFreqs, i / framerate, amplitude))
             list.append(value)
         return list
 
     @staticmethod
-    def __genScale(rootFreq, chord_id):
+    def genSingleNoteFreq(rootFreq, chord_id, duration, framerate, amplitude):
 
-        """ generates the list of frequencies of each pitch in the given chord type
+        """ generates the list of some lists, where each list element contains the name of the note in relation to the
+        chord or single note frequencies corresponding to each note of the chord.
+
+        Frequencies are rounded to the nearest integer. Any root note should be converted to root frequency by
+        fromIntToFreq(i) before being passed as argument. """
+
+        # obtain the scale given the root note and the type of chord
+        scaleFreqs = ChordUtil.__genScaleFreqs(rootFreq, chord_id)
+
+        list = []
+        i = 0
+        for freq in scaleFreqs:
+            name = ChordUtil.fromIntToNoteName(chord_id.getScale()[i])
+            list.append(name)
+            i += 1
+
+            temp = []
+            for j in range(duration * framerate):
+                value = int(ChordUtil.__computeNoteFreq(freq, j / framerate, amplitude))
+                temp.append(value)
+                print(value)
+            list.append(temp)
+
+        return list
+
+    @staticmethod
+    def __genScaleFreqs(rootFreq, chord_id):
+
+        """ generates the list of frequencies of each note in the given chord type.
         """
 
         scale = chord_id.getScale()
 
-        temp = []
+        list = []
         for note in scale:
             note = rootFreq * (pow(2, note / 12))
-            temp.append(note)
+            list.append(note)
 
-        return temp
+        return list
 
     @staticmethod
-    def __synChord(scale, t, A):
+    def __synScaleFreqs(scaleFreqs, t, A):
+
         value = 0
-        for i in range(len(scale)):
-            value += A * math.sin(2 * math.pi * scale[i] * t)
+        for i in range(len(scaleFreqs)):
+            value += ChordUtil.__computeNoteFreq(scaleFreqs[i], t, A)
         return value
+
+    @staticmethod
+    def __computeNoteFreq(freq, t, A):
+        return A * math.sin(2 * math.pi * freq * t)
 
     @staticmethod
     def readWav():
@@ -88,7 +122,7 @@ class ChordUtil:
     @staticmethod
     def fromIntToSPN(i):
 
-        """ returns the corresponding scientific pitch notation (SPN) given the pitch index
+        """ returns the corresponding scientific pitch notation (SPN) given the pitch index.
         """
 
         # TODO: throws exception if i is out of range
@@ -150,7 +184,7 @@ class ChordUtil:
     @staticmethod
     def fromIntToFreq(i):
 
-        """ returns the corresponding frequency given the pitch index
+        """ returns the corresponding frequency given the pitch index.
         """
 
         # TODO: throws exception if i is out of range
@@ -208,3 +242,21 @@ class ChordUtil:
             50: 3951,
             51: 4186,
         }[i]
+
+    @staticmethod
+    def fromIntToNoteName(i):
+
+        """ returns the name of the note given the index of note in the scale defined in Chord_id.py
+        """
+
+        return {
+            0: "Root note",
+            3: "Third note",
+            4: "Third note",
+            6: "Fifth note",
+            7: "Fifth note",
+            8: "Fifth note",
+            10: "Seventh note",
+            11: "Seventh note",
+        }[i]
+

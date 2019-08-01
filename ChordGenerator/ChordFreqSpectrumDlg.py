@@ -7,7 +7,7 @@ from PySide2.QtCharts import *
 
 # 3. Local Modules
 from FreqSpectrum import FreqSpectrum
-
+from ChordUtil import ChordUtil
 
 class ChordFreqSpectrumDlg(QDialog):
 
@@ -15,7 +15,7 @@ class ChordFreqSpectrumDlg(QDialog):
 
     It allows viewing features. """
 
-    def __init__(self, points, parent = None):
+    def __init__(self, points, chord_id, duration, framerate, rootNote, volume, parent = None):
         super().__init__(parent)
 
         self.setWindowTitle("Frequency spectrum")
@@ -27,6 +27,13 @@ class ChordFreqSpectrumDlg(QDialog):
         self.axis_x = None
         self.axis_y = None
 
+        # Data
+        self.chord_id = chord_id
+        self.duration = duration
+        self.framerate = framerate
+        self.rootNote = rootNote
+        self.volume = volume
+
         self.setup_spectrum(points)
 
         self.setup_ui()
@@ -34,8 +41,16 @@ class ChordFreqSpectrumDlg(QDialog):
     def setup_spectrum(self, points):
 
         self.spectrum = FreqSpectrum()
-        self.spectrum.addSeriesByPoints(points)
+        self.spectrum.addChordSeriesByPoints(points)
+
+        freqsList = ChordUtil.genSingleNoteFreq(ChordUtil.fromIntToFreq(self.rootNote), self.chord_id, self.duration,
+                                                self.framerate, self.volume)
+
+        for name, freqs in zip(freqsList[0::2], freqsList[1::2]):
+            self.spectrum.addNoteSeriesByProperties(name, freqs, self.framerate)
+
         self.spectrum.setup_chart(10, 9, True)
+        self.spectrum.legend().show()
 
     def setup_ui(self):
 
