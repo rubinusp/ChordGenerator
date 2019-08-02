@@ -40,3 +40,26 @@ class ChordID(IntEnum):
         else:
             return None
 
+    @staticmethod
+    def fromTextToChordId(text):
+
+        """ returns the chord id correspodning to the chord name. """
+
+        if text == "Major Seventh":
+            return ChordID.MAJOR_7TH
+        elif text == "Minor Seventh":
+            return ChordID.MINOR_7TH
+        elif text == "Dominant Seventh":
+            return ChordID.DOMIN_7TH
+        elif text == "Diminished Seventh":
+            return ChordID.DIMIN_7TH
+        elif text == "Major Triad":
+            return ChordID.MAJOR_TRI
+        elif text == "Minor Triad":
+            return ChordID.MINOR_TRI
+        elif text == "Augmented Triad":
+            return ChordID.AUGME_TRI
+        elif text == "Diminished Triad":
+            return ChordID.DIMIN_TRI
+        else:
+            return None

@@ -7,6 +7,7 @@ from PySide2.QtCore import *
 from PySide2.QtCharts import *
 
 # 3. Local Modules
+from chord_id import ChordID
 from ChordUtil import ChordUtil
 from FreqSpectrum import FreqSpectrum
 from ChordFreqSpectrumDlg import ChordFreqSpectrumDlg
@@ -81,6 +82,25 @@ class ChordDisplayDlg(QDialog):
         self.minorTri = QListWidgetItem("Minor Triad", self.chordList)
         self.augmeTri = QListWidgetItem("Augmented Triad", self.chordList)
         self.diminTri = QListWidgetItem("Diminished Triad", self.chordList)
+
+        if self.chord_id == ChordID.MAJOR_7TH:
+            self.chordList.setCurrentItem(self.major7th)
+        elif self.chord_id == ChordID.MINOR_7TH:
+            self.chordList.setCurrentItem(self.minor7th)
+        elif self.chord_id == ChordID.DOMIN_7TH:
+            self.chordList.setCurrentItem(self.domin7th)
+        elif self.chord_id == ChordID.DIMIN_7TH:
+            self.chordList.setCurrentItem(self.dimin7th)
+        elif self.chord_id == ChordID.MAJOR_TRI:
+            self.chordList.setCurrentItem(self.majorTri)
+        elif self.chord_id == ChordID.MINOR_TRI:
+            self.chordList.setCurrentItem(self.minorTri)
+        elif self.chord_id == ChordID.AUGME_TRI:
+            self.chordList.setCurrentItem(self.augmeTri)
+        elif self.chord_id == ChordID.DIMIN_TRI:
+            self.chordList.setCurrentItem(self.diminTri)
+
+        self.chordList.currentItemChanged.connect(self.on_chord_changed)
 
         chord_layout = QVBoxLayout()
         chord_layout.addWidget(self.chordList)
@@ -171,6 +191,13 @@ class ChordDisplayDlg(QDialog):
 
         # Set dialog layout
         self.setLayout(main_layout)
+
+    def on_chord_changed(self):
+        chord = self.chordList.currentItem()
+        self.chord_id = ChordID.fromTextToChordId(chord.text())
+
+        self.__redrawSeries()
+        return
 
     def on_root_note_value_changed(self):
 
